@@ -1,0 +1,218 @@
+/* Contenedor principal */
+.app-container {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+  }
+  
+  /* Sección de búsqueda */
+  .search-section {
+    background-color: #264b7e;
+    padding: 100px;
+    transition: background-color 0.3s ease;
+    }
+
+    .search-section:hover {
+        background-color: #608ac4;
+    }
+  
+  .main-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .search-form {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .search-wrapper {
+    position: relative;
+    width: 100%;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 1.25rem 1.25rem 1.25rem 1rem;
+    font-size: 1.125rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    background-color: #fff;
+    transition: all 0.3s ease;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  .search-button {
+    position: absolute;
+    right: -1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s ease;
+  }
+  
+  .search-button:hover {
+    color: #3b82f6;
+  }
+  
+  /* Contenedor de resultados */
+  .results-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  
+  /* Grid de series */
+  .series-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Contenedor de serie individual */
+  .series-card {
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .series-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Contenedor de imagen */
+  .series-image-container {
+    position: relative;
+    width: 100%;
+    padding-top: 150%;
+  }
+  
+  .series-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .no-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f1f5f9;
+    color: #64748b;
+  }
+  
+  /* Contenido de la serie */
+  .series-content {
+    padding: 1rem;
+  }
+  
+  .series-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #1a202c;
+  }
+  
+  .series-metadata {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .series-year {
+    color: #64748b;
+    font-size: 0.875rem;
+  }
+  
+  .series-genre {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .series-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #64748b;
+  }
+  
+  /* Botón de agregar */
+  .add-button {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+  
+  .add-button:hover {
+    background-color: #f8f9fa;
+    transform: scale(1.1);
+  }
+  
+  .add-button:disabled {
+    background-color: #e2e8f0;
+    cursor: not-allowed;
+  }
+  
+  /* Loading container */
+  .loading-container {
+    text-align: center;
+    padding: 2rem;
+    color: #64748b;
+  }
+  
+  /* Media queries */
+  @media (min-width: 640px) {
+    .series-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .series-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .series-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }

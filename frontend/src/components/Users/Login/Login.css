@@ -1,0 +1,83 @@
+.login-container {
+  max-width: 400px;
+  margin: 50px auto; /* Aumentamos el margen superior para separarlo de la cabecera */
+  padding: 40px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  background-color: #ffffff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.login-container h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 28px;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #555;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: #64748b;
+  outline: none;
+  box-shadow: 0 0 8px rgba(100, 116, 139, 0.5);
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  background-color: #64748b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #4b5563;
+}
+
+/* Estilos adicionales para mejorar el diseño */
+.login-container {
+  background: linear-gradient(135deg, #f9f9f9, #eaeaea);
+}
+
+.login-container h2 {
+  color: #2c3e50;
+}
+
+button {
+  background: linear-gradient(135deg, #64748b, #4b5563);
+  border: none;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #4b5563, #374151);
+}
