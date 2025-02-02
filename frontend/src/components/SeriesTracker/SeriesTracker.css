@@ -1,32 +1,28 @@
-/* Contenedor principal */
 .app-container {
     width: 100%;
     min-height: 100vh;
     background-color: #f8f9fa;
-  }
+}
   
-  /* Sección de búsqueda */
-  .search-section {
-    background-color: #264b7e;
-    padding: 100px;
-    transition: background-color 0.3s ease;
-    }
-
-    .search-section:hover {
-        background-color: #608ac4;
-    }
+ /* Sección de búsqueda */
+.search-section {
+  background-color: #264b7e;
+  padding: 100px;
+}
   
-  .main-title {
-    font-size: 2.5rem;
-    font-weight: 600;
-    color: white;
-    text-align: center;
-    margin-bottom: 2rem;
-  }
+.main-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: white;
+  text-align: center;
+  margin-bottom: 2rem;
+}
   
   .search-form {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
+    display: flex;
+    justify-content: flex-end; 
   }
   
   .search-wrapper {
@@ -36,35 +32,21 @@
   
   .search-input {
     width: 100%;
-    padding: 1.25rem 1.25rem 1.25rem 1rem;
-    font-size: 1.125rem;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
     border: 2px solid #e2e8f0;
     border-radius: 0.75rem;
     background-color: #fff;
     transition: all 0.3s ease;
   }
-  
-  .search-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-  
+    
   .search-button {
-    position: absolute;
-    right: -1rem;
+    position: relative;
+    width: 12rem;
     top: 50%;
     transform: translateY(-50%);
-    background: none;
     border: none;
-    color: #64748b;
     cursor: pointer;
-    padding: 0.5rem;
-    transition: color 0.2s ease;
-  }
-  
-  .search-button:hover {
-    color: #3b82f6;
   }
   
   /* Contenedor de resultados */
@@ -104,7 +86,8 @@
     position: relative;
     width: 100%;
     padding-top: 150%;
-  }
+    overflow: hidden; /* Añadir esta línea para evitar que el botón se salga del contenedor */
+}
   
   .series-image {
     position: absolute;
@@ -179,16 +162,17 @@
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
-  }
-  
+    z-index: 10; /* Añadir esta línea para asegurarse de que el botón esté por encima de la imagen */
+}
+
   .add-button:hover {
-    background-color: #f8f9fa;
-    transform: scale(1.1);
+      background-color: #f8f9fa;
+      transform: scale(1.1);
   }
-  
+
   .add-button:disabled {
-    background-color: #e2e8f0;
-    cursor: not-allowed;
+      background-color: #e2e8f0;
+      cursor: not-allowed;
   }
   
   /* Loading container */

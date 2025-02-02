@@ -56,7 +56,7 @@ const SeriesTracker = () => {
               className="search-input"
             />
             <button type="submit" className="search-button">
-              <Search size={24} />
+              <Search size={25} />
             </button>
           </div>
         </form>
