@@ -96,7 +96,14 @@ def login():
         logger.error(f"Error in /api/login: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
 
-
+@app.route('/api/series/<user_id>', methods=['GET'])
+def get_user_series(user_id):
+    try:
+        user_series = db_manager.get_user_series(user_id)
+        return jsonify({'series': user_series})
+    except Exception as e:
+        logger.error(f"Error in /api/series/{user_id}: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
 @app.route('/api/show/<int:show_id>', methods=['GET'])
 def get_show_details(show_id):
     try:

@@ -7,6 +7,7 @@ import Login from './components/Users/Login/Login';
 import Register from './components/Users/Register/Register';
 import Logout from './components/Users/Logout/Logout';
 import Header from './components/Common/Header/Header';
+import SeriesWatch from './components/SeriesWatch/SeriesWatch';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -33,6 +34,12 @@ function App() {
                   <>
                     <PageTitle title="Registrate - Series Tracker" />
                     <Register />
+                  </>
+                } />
+                <Route path="/series" element={
+                  <>
+                    <PageTitle title="Series - Series Tracker" />
+                    <SeriesWatch />
                   </>
                 } />
                 <Route path="/logout" element={<Logout />} />

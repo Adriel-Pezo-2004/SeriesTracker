@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import './Register.css';
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,7 +15,7 @@ const Register = () => {
       return;
     }
     try {
-      const response = await fetch('/api/register', {
+      const response = await fetch('http://localhost:5000/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -23,6 +25,20 @@ const Register = () => {
       const data = await response.json();
       if (response.ok) {
         alert('Registration successful');
+        const loginResponse = await fetch('http://localhost:5000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+        const loginData = await loginResponse.json();
+        if (loginResponse.ok) {
+          localStorage.setItem('token', loginData.token);
+          navigate('/');
+        } else {
+          alert(loginData.error);
+        }
       } else {
         alert(data.error);
       }
