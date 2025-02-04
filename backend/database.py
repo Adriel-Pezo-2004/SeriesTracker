@@ -15,7 +15,7 @@ class DatabaseManager:
                 self.client = MongoClient('mongodb://localhost:27017')
                 self.db = self.client['SeriesTracker']
                 self.users_collection = self.db['Usuarios']
-                self.series_collection = self.db['Series']  # Asegúrate de tener una colección para las series
+                self.series_collection = self.db['Series']
                 DatabaseManager._instance = self
                 logger.info("Successfully connected to MongoDB")
             except Exception as e:
@@ -35,15 +35,15 @@ class DatabaseManager:
 
     def authenticate_user(self, email, password):
         user = self.users_collection.find_one({"email": email})
-        if user and user['password'] == password:  # Compare plain text passwords
+        if user and user['password'] == password:
             return user
         return None
     
-    def get_user_series(self, user_id):
+    def get_user_series_by_email(self, email):
         try:
-            user_series = self.series_collection.find_one({"user_id": ObjectId(user_id)})
-            if user_series:
-                return user_series['series']
+            user_series_doc = self.series_collection.find_one({"email": email})
+            if user_series_doc:
+                return user_series_doc['series']
             return []
         except Exception as e:
             logger.error(f"Error getting user series: {str(e)}")

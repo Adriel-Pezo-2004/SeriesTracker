@@ -13,7 +13,7 @@ const Header = () => {
           <li><Link to="/">Home</Link></li>
           {user ? (
             <>
-              <li>{user.email}</li>
+              <li><Link to="/series">{user.email}</Link></li>
               <li><Link to="/logout">Logout</Link></li>
             </>
           ) : (

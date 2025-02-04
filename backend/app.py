@@ -96,14 +96,22 @@ def login():
         logger.error(f"Error in /api/login: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
 
-@app.route('/api/series/<user_id>', methods=['GET'])
-def get_user_series(user_id):
+@app.route('/api/series/<email>', methods=['GET'])
+def get_user_series(email):
     try:
-        user_series = db_manager.get_user_series(user_id)
+        logger.info(f"Received request for email: {email}")
+        user_series = db_manager.get_user_series_by_email(email)
+        
+        if not user_series:
+            logger.info(f"No series found for email: {email}")
+            return jsonify({'series': []})
+        
+        logger.info(f"Found series for user: {len(user_series)} series")
         return jsonify({'series': user_series})
     except Exception as e:
-        logger.error(f"Error in /api/series/{user_id}: {str(e)}")
+        logger.error(f"Error in /api/series/{email}: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
+    
 @app.route('/api/show/<int:show_id>', methods=['GET'])
 def get_show_details(show_id):
     try:
