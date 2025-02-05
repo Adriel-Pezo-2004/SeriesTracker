@@ -50,7 +50,7 @@ def token_required(f):
         try:
             token = token.split(" ")[1]  # Remove 'Bearer' prefix
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            db_manager.get_user_by_id(data['user_id'])  # Verify user exists
+            db_manager.get_user_by_email(data['email'])  # Verify user exists
         except jwt.ExpiredSignatureError:
             return jsonify({'error': 'Token has expired!'}), 403
         except jwt.InvalidTokenError:
@@ -74,7 +74,7 @@ def register():
     except Exception as e:
         logger.error(f"Error in /api/register: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
-
+    
 @app.route('/api/login', methods=['POST'])
 def login():
     try:
@@ -87,7 +87,6 @@ def login():
         if not user:
             return jsonify({'error': 'Invalid credentials'}), 401
         token = jwt.encode({
-            'user_id': str(user['_id']),
             'email': email,  # Incluir el email en el token
             'exp': datetime.utcnow() + timedelta(hours=24)
         }, app.config['SECRET_KEY'], algorithm="HS256")
@@ -163,5 +162,29 @@ def user_shows():
         logger.error(f"Error in /api/user/shows: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
 
+@app.route('/api/series/update_episode', methods=['POST'])
+@token_required
+def update_episode():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        series_id = data.get('series_id')
+        season_number = data.get('season_number')
+        episode_number = data.get('episode_number')
+        watched = data.get('watched')
+
+        if not email or not series_id or not season_number or not episode_number or watched is None:
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        result = db_manager.update_episode_status(email, series_id, season_number, episode_number, watched)
+        if result.modified_count == 0:
+            return jsonify({'error': 'Failed to update episode status'}), 400
+
+        return jsonify({'message': 'Episode status updated successfully'})
+    except Exception as e:
+        logger.error(f"Error in /api/series/update_episode: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
+

@@ -48,3 +48,23 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Error getting user series: {str(e)}")
             raise
+    
+    def update_episode_status(self, email, series_id, season_number, episode_number, watched):
+        try:
+            result = self.series_collection.update_one(
+                {"email": email, "series.series_id": series_id, "series.seasons.season_number": season_number, "series.seasons.episodes.episode_number": episode_number},
+                {"$set": {"series.$[series].seasons.$[season].episodes.$[episode].watched": watched}},
+                array_filters=[{"series.series_id": series_id}, {"season.season_number": season_number}, {"episode.episode_number": episode_number}]
+            )
+            return result
+        except Exception as e:
+            logger.error(f"Error updating episode status: {str(e)}")
+            raise
+
+    def get_user_by_email(self, email):
+        try:
+            user = self.users_collection.find_one({"email": email})
+            return user
+        except Exception as e:
+            logger.error(f"Error getting user by email: {str(e)}")
+            raise
