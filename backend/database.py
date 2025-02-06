@@ -39,6 +39,18 @@ class DatabaseManager:
             return user
         return None
     
+    def add_series_to_user(self, email, series):
+        try:
+            result = self.series_collection.update_one(
+                {"email": email},
+                {"$push": {"series": series}},
+                upsert=True
+            )
+            return result
+        except Exception as e:
+            logger.error(f"Error adding series to user: {str(e)}")
+            raise
+
     def get_user_series_by_email(self, email):
         try:
             user_series_doc = self.series_collection.find_one({"email": email})

@@ -95,6 +95,68 @@ def login():
         logger.error(f"Error in /api/login: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
 
+@app.route('/api/series/add', methods=['POST'])
+@token_required
+def add_series():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        series_id = data.get('series_id')
+
+        if not email or not series_id:
+            return jsonify({'error': 'Email and series_id are required'}), 400
+
+        # Fetch series details from TMDB API
+        response = requests.get(
+            f'https://api.themoviedb.org/3/tv/{series_id}',
+            params={
+                'api_key': os.getenv('TMDB_API_KEY'),
+                'language': 'es-ES'
+            }
+        )
+        series_data = response.json()
+
+        # Structure the series data
+        series = {
+            "series_id": series_data['id'],
+            "name": series_data['name'],
+            "poster_path": series_data['poster_path'],
+            "seasons": []
+        }
+
+        # Fetch seasons and episodes details
+        for season in range(1, series_data['number_of_seasons'] + 1):
+            season_response = requests.get(
+                f'https://api.themoviedb.org/3/tv/{series_id}/season/{season}',
+                params={
+                    'api_key': os.getenv('TMDB_API_KEY'),
+                    'language': 'es-ES'
+                }
+            )
+            season_data = season_response.json()
+            season_info = {
+                "season_number": season_data['season_number'],
+                "episodes": []
+            }
+            for episode in season_data['episodes']:
+                episode_info = {
+                    "episode_number": episode['episode_number'],
+                    "name": episode['name'],
+                    "air_date": episode['air_date'],
+                    "watched": False
+                }
+                season_info['episodes'].append(episode_info)
+            series['seasons'].append(season_info)
+
+        result = db_manager.add_series_to_user(email, series)
+        if result.modified_count == 0:
+            return jsonify({'error': 'Failed to add series'}), 400
+
+        return jsonify({'message': 'Series added successfully'})
+    except Exception as e:
+        logger.error(f"Error in /api/series/add: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
 @app.route('/api/series/<email>', methods=['GET'])
 def get_user_series(email):
     try:
@@ -184,6 +246,7 @@ def update_episode():
     except Exception as e:
         logger.error(f"Error in /api/series/update_episode: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

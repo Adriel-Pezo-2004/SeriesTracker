@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import axios from 'axios';
+import { AuthContext } from '../../context/AuthContext';
 import { Search, Plus, Check, Star } from 'lucide-react';
 import './SeriesTracker.css';
 
@@ -7,6 +9,7 @@ const SeriesTracker = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [myShows, setMyShows] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { user } = useContext(AuthContext);
 
   const searchShows = async (e) => {
     e.preventDefault();
@@ -14,9 +17,14 @@ const SeriesTracker = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/search?query=${encodeURIComponent(searchQuery)}`);
-      const data = await response.json();
-      setSearchResults(data.results || []);
+      const response = await axios.get(`https://api.themoviedb.org/3/search/tv`, {
+        params: {
+          api_key: '4e62a98e6cff448f769687990cc3be36',
+          query: searchQuery,
+          language: 'es-ES'
+        }
+      });
+      setSearchResults(response.data.results || []);
     } catch (error) {
       console.error('Error searching shows:', error);
     } finally {
@@ -26,18 +34,24 @@ const SeriesTracker = () => {
 
   const addToMyShows = async (show) => {
     try {
-      const response = await fetch('http://localhost:5000/api/user/shows', {
-        method: 'POST',
+      const response = await axios.post('http://localhost:5000/api/series/add', {
+        email: user.email,
+        series_id: show.id
+      }, {
         headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(show),
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
       });
-      if (response.ok) {
+
+      if (response.data.message) {
         setMyShows([...myShows, show]);
+        alert('Series added successfully');
+      } else {
+        alert('Failed to add series');
       }
     } catch (error) {
-      console.error('Error adding show:', error);
+      console.error('Error adding series:', error);
+      alert('An error occurred. Please try again.');
     }
   };
 
@@ -89,7 +103,7 @@ const SeriesTracker = () => {
                     {myShows.some((s) => s.id === show.id) ? (
                       <Check size={16} className="text-green-500" />
                     ) : (
-                      <Plus size={16} className="text-blue-500" />
+                      <span className="text-blue-500">+</span>
                     )}
                   </button>
                 </div>

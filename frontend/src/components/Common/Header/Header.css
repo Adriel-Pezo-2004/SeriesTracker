@@ -1,6 +1,11 @@
 .header {
+  position: fixed;
+  top: 0;
+  width: 100%;
   background-color: #64748b;
   padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
 .header nav ul {
@@ -24,3 +29,4 @@
 .header nav ul li a:hover {
   color: #d1d5db;
 }
+
