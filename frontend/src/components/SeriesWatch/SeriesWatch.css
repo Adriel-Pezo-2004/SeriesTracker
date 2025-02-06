@@ -28,7 +28,7 @@
 }
 
 .series-poster-watch {
-  flex: 0 0 30%; /* Cambiado a 30% */
+  flex: 0 0 30%; /* Ajustado a 30% */
   position: relative;
   background: #000;
   border-radius: 0.75rem 0 0 0.75rem;
@@ -56,9 +56,36 @@
 }
 
 .series-content-watch {
-  flex: 0 0 70%; /* Cambiado a 70% */
+  flex: 1;
   padding: 1.5rem;
   overflow-y: auto;
+}
+
+.progress-bar-container {
+  position: relative;
+  width: 100%;
+  padding: 0.5rem 0;
+  background-color: #e0e0e0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  height: 1rem;
+  background-color: #264b7e;
+  border-radius: 0.5rem;
+}
+
+.progress-percentage {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: #264b7e;
+  margin-top: 0.25rem;
 }
 
 .season-container {
@@ -70,7 +97,6 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  width: 107.5vh;
   background: #264b7e;
   color: white;
   cursor: pointer;
@@ -89,14 +115,15 @@
 
 .episodes-container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 0.5rem;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
 }
 
 .episode-item {
-  flex: 0 0 auto;
-  margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .episode-item label {
@@ -117,26 +144,26 @@
 }
 
 @media (max-width: 768px) {
-  .series-card {
+  .series-card-watch {
     flex-direction: column;
   }
 
-  .series-poster {
+  .series-poster-watch {
     flex: 0 0 auto;
     height: 400px;
     width: 100%;
   }
 
-  .series-content {
+  .series-content-watch {
     flex: 1;
     width: 100%;
   }
 
-  .series-title {
+  .series-title-watch {
     border-radius: 0;
   }
 
-  .series-image {
+  .series-image-watch {
     border-radius: 0.75rem 0.75rem 0 0;
   }
 }

@@ -7,7 +7,7 @@ const SeriesWatch = () => {
   const [seriesData, setSeriesData] = useState([]);
   const [error, setError] = useState(null);
   const { user } = useContext(AuthContext);
-  const [expandedSeasons, setExpandedSeasons] = useState({});
+  const [expandedSeason, setExpandedSeason] = useState(null);
 
   useEffect(() => {
     const fetchSeries = async () => {
@@ -59,10 +59,23 @@ const SeriesWatch = () => {
 
   const toggleSeasonExpansion = (seriesIndex, seasonIndex) => {
     const key = `${seriesIndex}-${seasonIndex}`;
-    setExpandedSeasons(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
+    setExpandedSeason(prev => (prev === key ? null : key));
+  };
+
+  const calculateProgress = (seasons) => {
+    let totalEpisodes = 0;
+    let watchedEpisodes = 0;
+
+    seasons.forEach(season => {
+      season.episodes.forEach(episode => {
+        totalEpisodes++;
+        if (episode.watched) {
+          watchedEpisodes++;
+        }
+      });
+    });
+
+    return totalEpisodes === 0 ? 0 : (watchedEpisodes / totalEpisodes) * 100;
   };
 
   return (
@@ -85,17 +98,26 @@ const SeriesWatch = () => {
               )}
               <h3 className="series-title-watch">{serie.name}</h3>
             </div>
-            <div className="series-content">
+            <div className="series-content-watch">
+              <div className="progress-bar-container">
+                <div
+                  className="progress-bar"
+                  style={{ width: `${calculateProgress(serie.seasons)}%` }}
+                ></div>
+                <span className="progress-percentage">
+                  {Math.round(calculateProgress(serie.seasons))}%
+                </span>
+              </div>
               {serie.seasons.map((season, seasonIndex) => (
                 <div key={season.season_number} className="season-container">
                   <div 
-                    className={`season-header ${expandedSeasons[`${seriesIndex}-${seasonIndex}`] ? 'expanded' : ''}`}
+                    className={`season-header ${expandedSeason === `${seriesIndex}-${seasonIndex}` ? 'expanded' : ''}`}
                     onClick={() => toggleSeasonExpansion(seriesIndex, seasonIndex)}
                   >
                     <span>Temporada {season.season_number}</span>
                     <span className="arrow">▼</span>
                   </div>
-                  {expandedSeasons[`${seriesIndex}-${seasonIndex}`] && (
+                  {expandedSeason === `${seriesIndex}-${seasonIndex}` && (
                     <div className="episodes-container">
                       {season.episodes.map((episode, episodeIndex) => (
                         <div key={episode.episode_number} className="episode-item">
