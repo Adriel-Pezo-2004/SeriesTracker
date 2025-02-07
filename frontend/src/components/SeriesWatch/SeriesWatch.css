@@ -64,7 +64,7 @@
 .progress-bar-container {
   position: relative;
   width: 100%;
-  padding: 0.5rem 0;
+  height: 1.7rem;
   background-color: #e0e0e0;
   border-radius: 0.5rem;
   overflow: hidden;
@@ -72,9 +72,20 @@
 }
 
 .progress-bar {
-  height: 1rem;
-  background-color: #264b7e;
+  height: 100%;
+  background: linear-gradient(270deg, #264b7e, #1e3a5f);
+  background-size: 200% 100%;
   border-radius: 0.5rem;
+  animation: wave 2s linear infinite;
+}
+
+@keyframes wave {
+  0% {
+    background-position: 200% 0%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
 }
 
 .progress-percentage {
@@ -84,8 +95,14 @@
   transform: translateX(-50%);
   font-size: 0.875rem;
   font-weight: bold;
-  color: #264b7e;
+  color: #7295c6;
   margin-top: 0.25rem;
+  z-index: 10;
+  transition: color 0.3s ease;
+}
+
+.progress-bar-container:hover .progress-percentage {
+  color: white;
 }
 
 .season-container {
@@ -134,9 +151,33 @@
 }
 
 .episode-item input[type="checkbox"] {
+  appearance: none;
   width: 1.2rem;
   height: 1.2rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.25rem;
+  outline: none;
   cursor: pointer;
+  position: relative;
+}
+
+.episode-item input[type="checkbox"]:hover {
+  border-color: #264b7e;
+}
+
+.episode-item input[type="checkbox"]:checked {
+  background-color: #264b7e;
+  border-color: #264b7e;
+}
+
+.episode-item input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 0.8rem;
 }
 
 .episode-name {
