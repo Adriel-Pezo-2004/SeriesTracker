@@ -247,6 +247,23 @@ def update_episode():
         logger.error(f"Error in /api/series/update_episode: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
 
+@app.route('/api/recommendations', methods=['GET'])
+def get_recommendations():
+    try:
+        response = requests.get(
+            f'{TMDB_BASE_URL}/tv/popular',
+            params={
+                'api_key': TMDB_API_KEY,
+                'language': 'es-ES',
+                'page': 1
+            }
+        )
+        data = response.json()
+        recommendations = [show['name'] for show in data['results']]
+        return jsonify({'recommendations': recommendations})
+    except Exception as e:
+        logger.error(f"Error in /api/recommendations: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -18,35 +18,64 @@
   margin-bottom: 2rem;
 }
 
+.recommendations {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0 auto 2rem;
+  display: inline-block;
+  height: 2rem;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  transform: translateX(0%); /* Ajusta según sea necesario */
+}
+
+.recommendations span {
+  display: inline-block;
+  border-right: 0.15em solid #ffffff; /* Cursor */
+}
+
 .search-form {
   max-width: 1000px;
   margin: 0 auto;
   display: flex;
-  justify-content: flex-end; 
+  justify-content: center; 
 }
 
 .search-wrapper {
   position: relative;
   width: 100%;
+  display: flex;
 }
 
 .search-input {
-  width: 100%;
+  flex: 1;
+  width: 60vh;
   padding: 1rem 1.25rem;
   font-size: 1rem;
   border: 2px solid #e2e8f0;
-  border-radius: 0.75rem;
+  border-radius: 0.75rem 0 0 0.75rem;
   background-color: #fff;
   transition: all 0.3s ease;
 }
 
 .search-button {
-  position: relative;
-  width: 12rem;
-  top: 50%;
-  transform: translateY(-50%);
-  border: none;
+  padding: 0.75rem 1rem; /* Reducir el tamaño del botón */
+  font-size: 1rem;
+  width: 20%;
+  border: 2px solid #e2e8f0;
+  border-left: none;
+  border-radius: 0 0.75rem 0.75rem 0;
+  background-color: #264b7e;
+  color: white;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-button:hover {
+  background-color: #1e3a5f;
 }
 
 /* Contenedor de resultados */
@@ -63,6 +92,7 @@
   gap: 1.5rem;
   background-color: #fff;
   padding: 2rem;
+  margin-top: 1.5rem;
   border-radius: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }

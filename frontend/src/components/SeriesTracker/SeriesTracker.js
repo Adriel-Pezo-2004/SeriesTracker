@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 import { Search, Plus, Check, Star } from 'lucide-react';
@@ -9,8 +9,80 @@ const SeriesTracker = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [myShows, setMyShows] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
+  const [currentRecommendation, setCurrentRecommendation] = useState('');
   const { user } = useContext(AuthContext);
 
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/recommendations');
+        setRecommendations(response.data.recommendations);
+      } catch (error) {
+        console.error('Failed to fetch recommendations:', error);
+      }
+    };
+
+    fetchRecommendations();
+  }, []);
+
+  useEffect(() => {
+    let index = 0;
+    let timeout;
+  
+    const typeWriterEffect = () => {
+      if (index < recommendations.length) {
+        const currentText = recommendations[index];
+        const textLength = currentText.length;
+  
+        // Tiempo por letra: 0.1s para una escritura más suave
+        const timePerLetter = 100;
+  
+        // Escribir el texto letra por letra
+        let currentIndex = 0;
+        const writeInterval = setInterval(() => {
+          if (currentIndex <= textLength) {
+            setCurrentRecommendation(currentText.slice(0, currentIndex));
+            currentIndex++;
+          } else {
+            clearInterval(writeInterval);
+  
+            // Esperar 1 segundo después de escribir
+            timeout = setTimeout(() => {
+              // Borrar el texto letra por letra
+              let deleteIndex = textLength;
+              const deleteInterval = setInterval(() => {
+                if (deleteIndex >= 0) {
+                  setCurrentRecommendation(currentText.slice(0, deleteIndex));
+                  deleteIndex--;
+                } else {
+                  clearInterval(deleteInterval);
+  
+                  // Pasar al siguiente texto
+                  index++;
+                  if (index >= recommendations.length) {
+                    index = 0; // Reiniciar el índice si llegamos al final
+                  }
+  
+                  // Iniciar el siguiente ciclo
+                  typeWriterEffect();
+                }
+              }, timePerLetter); // Mismo tiempo por letra para borrar
+            }, 1000); // Esperar 1 segundo después de escribir
+          }
+        }, timePerLetter); // Tiempo por letra para escribir
+      }
+    };
+  
+    // Iniciar el efecto
+    typeWriterEffect();
+  
+    // Limpiar intervalos y timeouts al desmontar el componente
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [recommendations]);
+  
   const searchShows = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
@@ -59,7 +131,9 @@ const SeriesTracker = () => {
     <div className="app-container">
       <div className="search-section">
         <h1 className="main-title">¿Qué serie estás buscando?</h1>
-        
+        <div className="recommendations">
+          <span>{currentRecommendation}</span>
+        </div>
         <form onSubmit={searchShows} className="search-form">
           <div className="search-wrapper">
             <input
