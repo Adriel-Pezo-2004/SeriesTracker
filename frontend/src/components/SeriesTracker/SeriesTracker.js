@@ -29,15 +29,15 @@ const SeriesTracker = () => {
   useEffect(() => {
     let index = 0;
     let timeout;
-  
+
     const typeWriterEffect = () => {
       if (index < recommendations.length) {
         const currentText = recommendations[index];
         const textLength = currentText.length;
-  
+
         // Tiempo por letra: 0.1s para una escritura más suave
-        const timePerLetter = 100;
-  
+        const timePerLetter = 150;
+
         // Escribir el texto letra por letra
         let currentIndex = 0;
         const writeInterval = setInterval(() => {
@@ -46,7 +46,7 @@ const SeriesTracker = () => {
             currentIndex++;
           } else {
             clearInterval(writeInterval);
-  
+
             // Esperar 1 segundo después de escribir
             timeout = setTimeout(() => {
               // Borrar el texto letra por letra
@@ -57,13 +57,13 @@ const SeriesTracker = () => {
                   deleteIndex--;
                 } else {
                   clearInterval(deleteInterval);
-  
+
                   // Pasar al siguiente texto
                   index++;
                   if (index >= recommendations.length) {
                     index = 0; // Reiniciar el índice si llegamos al final
                   }
-  
+
                   // Iniciar el siguiente ciclo
                   typeWriterEffect();
                 }
@@ -73,16 +73,16 @@ const SeriesTracker = () => {
         }, timePerLetter); // Tiempo por letra para escribir
       }
     };
-  
+
     // Iniciar el efecto
     typeWriterEffect();
-  
+
     // Limpiar intervalos y timeouts al desmontar el componente
     return () => {
       clearTimeout(timeout);
     };
   }, [recommendations]);
-  
+
   const searchShows = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
