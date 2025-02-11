@@ -265,6 +265,44 @@ def get_recommendations():
         logger.error(f"Error in /api/recommendations: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
 
+@app.route('/api/users', methods=['GET'])
+@token_required
+def get_user_info():
+    try:
+        email = request.args.get('email')
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+
+        user = db_manager.get_user_by_email(email)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        return jsonify({'email': user['email']})
+    except Exception as e:
+        logger.error(f"Error in /api/users: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+    
+@app.route('/api/users', methods=['PUT'])
+@token_required
+def update_user_info():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        new_email = data.get('new_email')
+        password = data.get('password')
+
+        if not email or not new_email or not password:
+            return jsonify({'error': 'Email, new email, and password are required'}), 400
+
+        result = db_manager.update_user_info(email, new_email, password)
+        if 'error' in result:
+            return jsonify(result), 400
+
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Error in /api/users: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+    
 if __name__ == '__main__':
     app.run(debug=True)
 

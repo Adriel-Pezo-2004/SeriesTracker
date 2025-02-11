@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import './App.css';
 import SeriesTracker from './components/SeriesTracker/SeriesTracker'; 
 import PageTitle from './components/PageTitle/PageTitle';
@@ -8,7 +8,9 @@ import Register from './components/Users/Register/Register';
 import Logout from './components/Users/Logout/Logout';
 import Header from './components/Common/Header/Header';
 import SeriesWatch from './components/SeriesWatch/SeriesWatch';
-import { AuthProvider } from './context/AuthContext';
+import Profile from './components/Common/Profile/Profile';
+import { AuthProvider, AuthContext } from './context/AuthContext';
+
 
 function App() {
   return (
@@ -43,6 +45,12 @@ function App() {
                   </>
                 } />
                 <Route path="/logout" element={<Logout />} />
+                <Route path="/perfil" element={
+                    <>
+                      <PageTitle title="Mi Perfil - Series Tracker" />
+                      <Profile />
+                    </>
+                } />
             </Routes>
           </div>
         </div>

@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from bson import ObjectId
-from datetime import datetime
+import jwt
+from datetime import datetime, timedelta
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -79,4 +80,25 @@ class DatabaseManager:
             return user
         except Exception as e:
             logger.error(f"Error getting user by email: {str(e)}")
+            raise
+    
+    def update_user_info(self, email, new_email, password):
+        try:
+            # Aquí deberías actualizar la información del usuario en la base de datos
+            result = self.db.users.update_one(
+                {'email': email},
+                {'$set': {'email': new_email, 'password': password}}
+            )
+            if result.modified_count == 0:
+                return {'error': 'Failed to update user info'}
+
+            # Generar un nuevo token con el nuevo email
+            token = jwt.encode({
+                'email': new_email,
+                'exp': datetime.utcnow() + timedelta(hours=24)
+            }, 'your_secret_key', algorithm="HS256")
+
+            return {'message': 'User info updated successfully', 'token': token}
+        except Exception as e:
+            logger.error(f"Error updating user info: {str(e)}")
             raise
