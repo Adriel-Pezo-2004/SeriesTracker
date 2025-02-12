@@ -23,21 +23,22 @@ class DatabaseManager:
                 logger.error(f"Error connecting to MongoDB: {str(e)}")
                 raise
 
-    def register_user(self, email, password):
+    def register_user(self, email, password, name):
         if self.users_collection.find_one({"email": email}):
             return {"error": "User already exists"}
         user = {
             "email": email,
-            "password": password,  # Store password as plain text (not recommended for production)
+            "password": password,  
+            "name": name,
             "created_at": datetime.utcnow()
         }
         self.users_collection.insert_one(user)
         return {"message": "User registered successfully"}
 
     def authenticate_user(self, email, password):
-        user = self.users_collection.find_one({"email": email})
-        if user and user['password'] == password:
-            return user
+        user = self.users_collection.find_one({"email": email, "password": password})
+        if user:
+            return {"email": user["email"], "name": user["name"]}
         return None
     
     def add_series_to_user(self, email, series):
@@ -76,25 +77,28 @@ class DatabaseManager:
 
     def get_user_by_email(self, email):
         try:
-            user = self.users_collection.find_one({"email": email})
-            return user
+            user = self.users_collection.find_one({'email': email})
+            if user:
+                return {'email': user['email'], 'name': user['name'], 'password': user['password']}
+            return None
         except Exception as e:
             logger.error(f"Error getting user by email: {str(e)}")
             raise
     
-    def update_user_info(self, email, new_email, password):
+    def update_user_info(self, email, password, name):
         try:
             # Aquí deberías actualizar la información del usuario en la base de datos
-            result = self.db.users.update_one(
+            result = self.users_collection.update_one(
                 {'email': email},
-                {'$set': {'email': new_email, 'password': password}}
+                {'$set': {'password': password, 'name': name}}
             )
             if result.modified_count == 0:
                 return {'error': 'Failed to update user info'}
 
-            # Generar un nuevo token con el nuevo email
+            # Generar un nuevo token con el nuevo nombre
             token = jwt.encode({
-                'email': new_email,
+                'email': email,
+                'name': name,
                 'exp': datetime.utcnow() + timedelta(hours=24)
             }, 'your_secret_key', algorithm="HS256")
 

@@ -67,9 +67,10 @@ def register():
         data = request.get_json()
         email = data.get('email')
         password = data.get('password')
-        if not email or not password:
-            return jsonify({'error': 'Email and password are required'}), 400
-        result = db_manager.register_user(email, password)
+        name = data.get('name')
+        if not email or not password or not name:
+            return jsonify({'error': 'Email, password, and name are required'}), 400
+        result = db_manager.register_user(email, password, name)
         return jsonify(result), 201 if 'message' in result else 400
     except Exception as e:
         logger.error(f"Error in /api/register: {str(e)}")
@@ -87,10 +88,11 @@ def login():
         if not user:
             return jsonify({'error': 'Invalid credentials'}), 401
         token = jwt.encode({
-            'email': email,  # Incluir el email en el token
+            'email': email,
+            'name': user['name'],  # Incluir el nombre en el token
             'exp': datetime.utcnow() + timedelta(hours=24)
         }, app.config['SECRET_KEY'], algorithm="HS256")
-        return jsonify({'token': token})
+        return jsonify({'token': token, 'name': user['name']})
     except Exception as e:
         logger.error(f"Error in /api/login: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
@@ -277,7 +279,7 @@ def get_user_info():
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
-        return jsonify({'email': user['email']})
+        return jsonify({'email': user['email'], 'name': user['name'], 'password': user['password']})
     except Exception as e:
         logger.error(f"Error in /api/users: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
@@ -288,13 +290,13 @@ def update_user_info():
     try:
         data = request.get_json()
         email = data.get('email')
-        new_email = data.get('new_email')
         password = data.get('password')
+        name = data.get('name')
 
-        if not email or not new_email or not password:
-            return jsonify({'error': 'Email, new email, and password are required'}), 400
+        if not email or not password or not name:
+            return jsonify({'error': 'Email, password, and name are required'}), 400
 
-        result = db_manager.update_user_info(email, new_email, password)
+        result = db_manager.update_user_info(email, password, name)
         if 'error' in result:
             return jsonify(result), 400
 
@@ -302,7 +304,7 @@ def update_user_info():
     except Exception as e:
         logger.error(f"Error in /api/users: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
-    
+
 if __name__ == '__main__':
     app.run(debug=True)
 

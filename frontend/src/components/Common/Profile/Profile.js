@@ -3,10 +3,11 @@ import { AuthContext } from '../../../context/AuthContext';
 import './Profile.css';
 
 const Profile = () => {
-  const { user } = useContext(AuthContext);
+  const { user, updateUser } = useContext(AuthContext);
   const [email, setEmail] = useState(user.email);
-  const [newEmail, setNewEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState(user.name || '');
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     // Obtener la información del usuario desde el backend usando el email
@@ -18,6 +19,8 @@ const Profile = () => {
       .then(response => response.json())
       .then(data => {
         setEmail(data.email);
+        setName(data.name);
+        setPassword(data.password); // Establecer la contraseña
       })
       .catch(error => console.error('Error al obtener la información del usuario:', error));
   }, [user.email]);
@@ -31,11 +34,11 @@ const Profile = () => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
-      body: JSON.stringify({ email, new_email: newEmail, password }),
+      body: JSON.stringify({ email, password, name }),
     })
       .then(response => {
         if (!response.ok) {
-          throw new Error('Error al actualizar la información del usuario');
+          return response.json().then(err => { throw new Error(err.error); });
         }
         return response.json();
       })
@@ -43,54 +46,62 @@ const Profile = () => {
         alert('Información actualizada correctamente');
         console.log('Información actualizada:', data);
 
-        // Guardar el nuevo token en el almacenamiento local
-        localStorage.setItem('token', data.token);
+        // Actualizar el usuario y el token en el contexto
+        updateUser({ email, name }, data.token);
 
-        // Actualizar el estado del email
-        setEmail(newEmail);
-        setNewEmail('');
+        // Limpiar los campos de contraseña
         setPassword('');
+        setIsEditing(false);
       })
       .catch(error => {
-        alert('Error al actualizar la información del usuario');
-        console.error(error);
+        alert(`Error al actualizar la información del usuario: ${error.message}`);
+        console.error('Error:', error);
       });
   };
 
   return (
     <div className="profile-container">
       <h1 className="profile-title">Mi Perfil</h1>
-      <form className="profile-form" onSubmit={handleUpdate}>
-        <div className="profile-field">
-          <label className="profile-label">Email:</label>
-          <input 
-            type="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            className="profile-input"
-            disabled
-          />
+      <i className="fas fa-user profile-icon"></i>
+      {isEditing ? (
+        <form className="profile-form" onSubmit={handleUpdate}>
+          <div className="profile-field">
+            <label className="profile-label">Email:</label>
+            <input 
+              type="email" 
+              value={email} 
+              className="profile-input"
+              disabled
+            />
+          </div>
+          <div className="profile-field">
+            <label className="profile-label">Nombre:</label>
+            <input 
+              type="text" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              className="profile-input"
+            />
+          </div>
+          <div className="profile-field">
+            <label className="profile-label">Contraseña:</label>
+            <input 
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              className="profile-input"
+            />
+          </div>
+          <button type="submit" className="profile-button">Actualizar</button>
+          <button type="button" className="profile-button" onClick={() => setIsEditing(false)}>Cancelar</button>
+        </form>
+      ) : (
+        <div className="profile-info">
+          <p><strong>Email:</strong> {email}</p>
+          <p><strong>Nombre:</strong> {name}</p>
+          <button className="profile-button" onClick={() => setIsEditing(true)}>Editar</button>
         </div>
-        <div className="profile-field">
-          <label className="profile-label">Nuevo Email:</label>
-          <input 
-            type="email" 
-            value={newEmail} 
-            onChange={(e) => setNewEmail(e.target.value)} 
-            className="profile-input"
-          />
-        </div>
-        <div className="profile-field">
-          <label className="profile-label">Contraseña:</label>
-          <input 
-            type="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            className="profile-input"
-          />
-        </div>
-        <button type="submit" className="profile-button">Actualizar</button>
-      </form>
+      )}
     </div>
   );
 };

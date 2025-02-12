@@ -11,13 +11,18 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        setUser({ email: decodedToken.email });
+        setUser({ email: decodedToken.email, name: decodedToken.name });
       } catch (error) {
         console.error('Error decoding token:', error);
         localStorage.removeItem('token');
       }
     }
   }, []);
+
+  const updateUser = (newUser, newToken) => {
+    setUser(newUser);
+    localStorage.setItem('token', newToken);
+  };
 
   const login = (userData) => {
     setUser(userData);
