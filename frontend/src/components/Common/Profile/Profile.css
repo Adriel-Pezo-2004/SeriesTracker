@@ -1,3 +1,9 @@
+body.profile-background {
+  background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), 
+              url('https://www.pointgadget.com/wp-content/uploads/2019/12/best-netflix-alternatives.jpg');
+  background-size: 220vh;
+}
+
 .profile-container {
   max-width: 50vh;
   margin: 0 auto;
@@ -8,7 +14,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  
   position: absolute;
   top: 50%;
   left: 50%;
@@ -16,16 +21,34 @@
 }
 
 .profile-title {
-  color: #333;
   font-size: 2rem;
-  margin: 0.25rem;
-  font-weight: 500;
+  margin: 0;
+  font-weight: 700;
+  background: url('https://www.pointgadget.com/wp-content/uploads/2019/12/best-netflix-alternatives.jpg');
+  background-size: cover;
+  background-position: center;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.profile-title2 {
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.profile-title3 {
+  color: #333;
+  font-size: 1rem;
 }
 
 .profile-icon {
   font-size: 5rem;
   color: #333;
-  margin: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .profile-form {
@@ -72,4 +95,3 @@
 .profile-button:hover {
   background-color: #17a74a;
 }
-

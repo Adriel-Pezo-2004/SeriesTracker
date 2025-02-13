@@ -10,6 +10,9 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
+    // Agregar clase al body cuando se monta el componente
+    document.body.classList.add('profile-background');
+
     // Obtener la información del usuario desde el backend usando el email
     fetch(`http://localhost:5000/api/users?email=${user.email}`, {
       headers: {
@@ -23,6 +26,11 @@ const Profile = () => {
         setPassword(data.password); // Establecer la contraseña
       })
       .catch(error => console.error('Error al obtener la información del usuario:', error));
+
+    // Quitar clase del body cuando se desmonta el componente
+    return () => {
+      document.body.classList.remove('profile-background');
+    };
   }, [user.email]);
 
   const handleUpdate = (e) => {
