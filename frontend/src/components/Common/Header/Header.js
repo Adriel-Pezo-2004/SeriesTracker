@@ -15,7 +15,7 @@ const Header = () => {
             <>
               <li><Link to="/series">Series</Link></li>
               <li><Link to="/perfil">{user.name}</Link></li>
-              <li><Link to="/logout">Logout</Link></li>
+              <li><Link to="/logout" className='logout-link'>Logout</Link></li>
             </>
           ) : (
             <>

@@ -23,10 +23,18 @@
 .header nav ul li a {
   color: white;
   text-decoration: none;
-  transition: color 0.3s ease;
+  font-weight: 400;
+  display: inline-block; /* Evita que el zoom afecte el espaciado */
+  transition: transform 0.4s ease-out; /* Suaviza el efecto */
+  transform-origin: center; /* Hace que el zoom sea uniforme */
 }
 
 .header nav ul li a:hover {
-  color: #d1d5db;
+  transform: scale(1.15); /* Zoom más controlado */
+  font-weight: 600;
 }
 
+.header nav ul li a.logout-link:hover {
+  color: rgb(228, 56, 56); 
+  font-weight: 700;
+}
