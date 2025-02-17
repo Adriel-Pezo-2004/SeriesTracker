@@ -23,7 +23,7 @@ const Header = () => {
             <>
               <li><Link to="/series">Series</Link></li>
               <li><Link to="/perfil">{user.name}</Link></li>
-              <li><button className="logout-link" onClick={() => setIsModalOpen(true)}>Logout</button></li>
+              <li><button className="logout-link button" onClick={() => setIsModalOpen(true)}>Logout</button></li>
             </>
           ) : (
             <>
