@@ -1,10 +1,18 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
+import LogoutModal from '../../Users/LogoutModal/LogoutModal';
 import './Header.css';
 
 const Header = () => {
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <header className="header">
@@ -15,7 +23,7 @@ const Header = () => {
             <>
               <li><Link to="/series">Series</Link></li>
               <li><Link to="/perfil">{user.name}</Link></li>
-              <li><Link to="/logout" className='logout-link'>Logout</Link></li>
+              <li><button className="logout-link" onClick={() => setIsModalOpen(true)}>Logout</button></li>
             </>
           ) : (
             <>
@@ -25,6 +33,11 @@ const Header = () => {
           )}
         </ul>
       </nav>
+      <LogoutModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleLogout}
+      />
     </header>
   );
 };

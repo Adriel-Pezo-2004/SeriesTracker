@@ -20,21 +20,36 @@
   margin: 0 10px;
 }
 
-.header nav ul li a {
+.header nav ul li a,
+.header nav ul li button {
   color: white;
   text-decoration: none;
   font-weight: 400;
   display: inline-block; /* Evita que el zoom afecte el espaciado */
-  transition: transform 0.4s ease-out; /* Suaviza el efecto */
+  transition: transform 0.4s ease-out, color 0.4s ease-out; /* Suaviza el efecto */
   transform-origin: center; /* Hace que el zoom sea uniforme */
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
-.header nav ul li a:hover {
+.header nav ul li a:hover,
+.header nav ul li button:hover {
   transform: scale(1.15); /* Zoom más controlado */
   font-weight: 600;
 }
 
-.header nav ul li a.logout-link:hover {
+.header nav ul li button.logout-link:hover {
   color: rgb(228, 56, 56); 
   font-weight: 700;
+}
+
+button {
+  margin: 0;
+  font-weight: 400;
+  font-size: 1rem;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
