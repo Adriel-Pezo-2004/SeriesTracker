@@ -22,6 +22,24 @@ class DatabaseManager:
             except Exception as e:
                 logger.error(f"Error connecting to MongoDB: {str(e)}")
                 raise
+    
+    def get_series_by_user(self, email, series_id):
+        return self.series_collection.find_one({"email": email, "series.series_id": series_id}) is not None
+
+    def add_series_to_user(self, email, series):
+        try:
+            if self.get_series_by_user(email, series['id']):
+                return {'error': 'Esta serie ya ha sido agregada'}
+
+            result = self.series_collection.update_one(
+                {"email": email},
+                {"$push": {"series": series}},
+                upsert=True
+            )
+            return result
+        except Exception as e:
+            logger.error(f"Error adding series to user: {str(e)}")
+            raise
 
     def register_user(self, email, password, name):
         if self.users_collection.find_one({"email": email}):
@@ -40,18 +58,6 @@ class DatabaseManager:
         if user:
             return {"email": user["email"], "name": user["name"]}
         return None
-    
-    def add_series_to_user(self, email, series):
-        try:
-            result = self.series_collection.update_one(
-                {"email": email},
-                {"$push": {"series": series}},
-                upsert=True
-            )
-            return result
-        except Exception as e:
-            logger.error(f"Error adding series to user: {str(e)}")
-            raise
 
     def get_user_series_by_email(self, email):
         try:

@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 import { Search, Plus, Check, Star } from 'lucide-react';
+import ErrorModal from '../Common/ErrorModal/ErrorModal';
 import './SeriesTracker.css';
 
 const SeriesTracker = () => {
@@ -11,6 +12,8 @@ const SeriesTracker = () => {
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
   const [currentRecommendation, setCurrentRecommendation] = useState('');
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
@@ -105,6 +108,12 @@ const SeriesTracker = () => {
   };
 
   const addToMyShows = async (show) => {
+    if (myShows.some((s) => s.id === show.id)) {
+      setErrorMessage('Esta serie ya ha sido agregada.');
+      setIsErrorModalOpen(true);
+      return;
+    }
+  
     try {
       const response = await axios.post('http://localhost:5000/api/series/add', {
         email: user.email,
@@ -114,18 +123,19 @@ const SeriesTracker = () => {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-
+  
       if (response.data.message) {
         setMyShows([...myShows, show]);
         alert('Series added successfully');
       } else {
-        alert('Failed to add series');
+        setErrorMessage(response.data.error || 'Failed to add series');
+        setIsErrorModalOpen(true);
       }
     } catch (error) {
-      console.error('Error adding series:', error);
-      alert('An error occurred. Please try again.');
+      setErrorMessage(error.response?.data?.error || 'An error occurred. Please try again.');
+      setIsErrorModalOpen(true);
     }
-  };
+  };  
 
   return (
     <div className="app-container">
@@ -198,6 +208,12 @@ const SeriesTracker = () => {
           </div>
         </div>
       )}
+
+      <ErrorModal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        message={errorMessage}
+      />
     </div>
   );
 };

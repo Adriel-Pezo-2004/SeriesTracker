@@ -108,49 +108,22 @@ def add_series():
         if not email or not series_id:
             return jsonify({'error': 'Email and series_id are required'}), 400
 
-        # Fetch series details from TMDB API
+        # Verificar si la serie ya ha sido añadida por el usuario
+        if db_manager.get_series_by_user(email, series_id):
+            return jsonify({'error': 'Esta serie ya ha sido agregada'}), 400
+
+        # Obtener detalles de la serie desde la API de TMDB
         response = requests.get(
             f'https://api.themoviedb.org/3/tv/{series_id}',
-            params={
-                'api_key': os.getenv('TMDB_API_KEY'),
-                'language': 'es-ES'
-            }
+            params={'api_key': TMDB_API_KEY, 'language': 'es-ES'}
         )
         series_data = response.json()
 
-        # Structure the series data
-        series = {
-            "series_id": series_data['id'],
-            "name": series_data['name'],
-            "poster_path": series_data['poster_path'],
-            "seasons": []
-        }
+        if 'id' not in series_data:
+            return jsonify({'error': 'Invalid series ID'}), 400
 
-        # Fetch seasons and episodes details
-        for season in range(1, series_data['number_of_seasons'] + 1):
-            season_response = requests.get(
-                f'https://api.themoviedb.org/3/tv/{series_id}/season/{season}',
-                params={
-                    'api_key': os.getenv('TMDB_API_KEY'),
-                    'language': 'es-ES'
-                }
-            )
-            season_data = season_response.json()
-            season_info = {
-                "season_number": season_data['season_number'],
-                "episodes": []
-            }
-            for episode in season_data['episodes']:
-                episode_info = {
-                    "episode_number": episode['episode_number'],
-                    "name": episode['name'],
-                    "air_date": episode['air_date'],
-                    "watched": False
-                }
-                season_info['episodes'].append(episode_info)
-            series['seasons'].append(season_info)
-
-        result = db_manager.add_series_to_user(email, series)
+        # Agregar la serie a la base de datos
+        result = db_manager.add_series_to_user(email, series_data)
         if result.modified_count == 0:
             return jsonify({'error': 'Failed to add series'}), 400
 
