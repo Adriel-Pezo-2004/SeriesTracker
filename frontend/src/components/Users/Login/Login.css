@@ -1,20 +1,26 @@
 .login-container {
-  max-width: 400px;
-  margin: 50px auto; /* Aumentamos el margen superior para separarlo de la cabecera */
-  padding: 40px;
-  border: 1px solid #ccc;
-  border-radius: 15px;
-  background-color: #ffffff;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  max-width: 50vh;
+  margin: 0 auto;
+  padding: 2rem 5rem;
+  background-color: #f9f9f9;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-.login-container h2 {
+.login-title {
   text-align: center;
   margin-bottom: 30px;
   font-size: 28px;
+  font-weight: 800;
   color: #333;
   font-family: 'Arial', sans-serif;
-  font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
@@ -62,22 +68,4 @@ button {
 
 button:hover {
   background-color: #4b5563;
-}
-
-/* Estilos adicionales para mejorar el diseño */
-.login-container {
-  background: linear-gradient(135deg, #f9f9f9, #eaeaea);
-}
-
-.login-container h2 {
-  color: #2c3e50;
-}
-
-button {
-  background: linear-gradient(135deg, #64748b, #4b5563);
-  border: none;
-}
-
-button:hover {
-  background: linear-gradient(135deg, #4b5563, #374151);
 }

@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
 import SeriesTracker from './components/SeriesTracker/SeriesTracker'; 
 import PageTitle from './components/PageTitle/PageTitle';
@@ -9,7 +9,7 @@ import Logout from './components/Users/Logout/Logout';
 import Header from './components/Common/Header/Header';
 import SeriesWatch from './components/SeriesWatch/SeriesWatch';
 import Profile from './components/Common/Profile/Profile';
-import { AuthProvider, AuthContext } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 
 
 function App() {
