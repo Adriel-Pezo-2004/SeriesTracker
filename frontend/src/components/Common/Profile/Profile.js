@@ -4,67 +4,75 @@ import './Profile.css';
 
 const Profile = () => {
   const { user, updateUser } = useContext(AuthContext);
-  const [email, setEmail] = useState(user.email);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState(user.name || '');
+  const [name, setName] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    // Agregar clase al body cuando se monta el componente
     document.body.classList.add('profile-background');
 
-    // Obtener la información del usuario desde el backend usando el email
-    fetch(`http://localhost:5000/api/users?email=${user.email}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        setEmail(data.email);
-        setName(data.name);
-        setPassword(data.password); // Establecer la contraseña
-      })
-      .catch(error => console.error('Error al obtener la información del usuario:', error));
+    const fetchUserData = async () => {
+      if (!user?.email) return;
+      
+      try {
+        const response = await fetch(`http://localhost:5000/api/users?email=${user.email}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
 
-    // Quitar clase del body cuando se desmonta el componente
+        if (!response.ok) {
+          throw new Error('Error al obtener la información del usuario');
+        }
+
+        const data = await response.json();
+        setEmail(data.email);
+        setName(data.name || '');
+      } catch (error) {
+        console.error('Error al obtener la información del usuario:', error);
+      }
+    };
+
+    fetchUserData();
+
     return () => {
       document.body.classList.remove('profile-background');
     };
-  }, [user.email]);
+  }, [user?.email]);
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    // Actualizar la información del usuario en el backend usando el email
-    fetch(`http://localhost:5000/api/users`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify({ email, password, name }),
-    })
-      .then(response => {
-        if (!response.ok) {
-          return response.json().then(err => { throw new Error(err.error); });
-        }
-        return response.json();
-      })
-      .then(data => {
-        alert('Información actualizada correctamente');
-        console.log('Información actualizada:', data);
 
-        // Actualizar el usuario y el token en el contexto
-        updateUser({ email, name }, data.token);
+    const updatedData = { email, name };
+    if (password) {
+      updatedData.password = password;
+    }
 
-        // Limpiar los campos de contraseña
-        setPassword('');
-        setIsEditing(false);
-      })
-      .catch(error => {
-        alert(`Error al actualizar la información del usuario: ${error.message}`);
-        console.error('Error:', error);
+    try {
+      const response = await fetch(`http://localhost:5000/api/users`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(updatedData),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al actualizar la información del usuario');
+      }
+
+      const data = await response.json();
+      updateUser({ email, name }, data.token);
+      setPassword('');
+      setIsEditing(false);
+      alert('Información actualizada correctamente');
+    } catch (error) {
+      alert(`Error al actualizar la información del usuario: ${error.message}`);
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -75,28 +83,28 @@ const Profile = () => {
         <form className="profile-form" onSubmit={handleUpdate}>
           <div className="profile-field">
             <label className="profile-label">Email:</label>
-            <input 
-              type="email" 
-              value={email} 
+            <input
+              type="email"
+              value={email}
               className="profile-input"
               disabled
             />
           </div>
           <div className="profile-field">
             <label className="profile-label">Nombre:</label>
-            <input 
-              type="text" 
-              value={name} 
-              onChange={(e) => setName(e.target.value)} 
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="profile-input"
             />
           </div>
           <div className="profile-field">
             <label className="profile-label">Contraseña:</label>
-            <input 
-              type="password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="profile-input"
             />
           </div>

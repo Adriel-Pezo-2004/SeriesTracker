@@ -263,12 +263,13 @@ def update_user_info():
     try:
         data = request.get_json()
         email = data.get('email')
-        password = data.get('password')
         name = data.get('name')
+        password = data.get('password')
 
-        if not email or not password or not name:
-            return jsonify({'error': 'Email, password, and name are required'}), 400
+        if not email or not name:
+            return jsonify({'error': 'Email and name are required'}), 400
 
+        # Llamar a la función de actualización en database.py
         result = db_manager.update_user_info(email, password, name)
         if 'error' in result:
             return jsonify(result), 400
@@ -277,6 +278,7 @@ def update_user_info():
     except Exception as e:
         logger.error(f"Error in /api/users: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

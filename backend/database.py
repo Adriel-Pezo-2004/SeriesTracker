@@ -93,22 +93,26 @@ class DatabaseManager:
     
     def update_user_info(self, email, password, name):
         try:
-            # Aquí deberías actualizar la información del usuario en la base de datos
+            update_fields = {'name': name}
+            if password:
+                update_fields['password'] = password
+
             result = self.users_collection.update_one(
                 {'email': email},
-                {'$set': {'password': password, 'name': name}}
+                {'$set': update_fields}
             )
-            if result.modified_count == 0:
-                return {'error': 'Failed to update user info'}
 
-            # Generar un nuevo token con el nuevo nombre
+            if result.modified_count == 0:
+                return {'error': 'No se realizaron cambios'}
+
+            # Generar nuevo token con el nuevo nombre
             token = jwt.encode({
                 'email': email,
                 'name': name,
                 'exp': datetime.utcnow() + timedelta(hours=24)
             }, 'your_secret_key', algorithm="HS256")
 
-            return {'message': 'User info updated successfully', 'token': token}
+            return {'message': 'Información actualizada correctamente', 'token': token}
         except Exception as e:
-            logger.error(f"Error updating user info: {str(e)}")
-            raise
+            logger.error(f"Error actualizando usuario: {str(e)}")
+            return {'error': 'Error interno del servidor'}

@@ -1,40 +1,48 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        setUser({ email: decodedToken.email, name: decodedToken.name });
+        return { email: decodedToken.email, name: decodedToken.name };
       } catch (error) {
         console.error('Error decoding token:', error);
         localStorage.removeItem('token');
       }
     }
+    return null;
+  });
+
+  const updateUser = useCallback((newUser, newToken) => {
+    if (newToken) {
+      localStorage.setItem('token', newToken);
+    }
+    setUser(newUser);
   }, []);
 
-  const updateUser = (newUser, newToken) => {
-    setUser(newUser);
-    localStorage.setItem('token', newToken);
-  };
-
-  const login = (userData) => {
+  const login = useCallback((userData) => {
     setUser(userData);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('token');
     setUser(null);
-  };
+  }, []);
+
+  const value = React.useMemo(() => ({
+    user,
+    login,
+    logout,
+    updateUser
+  }), [user, login, logout, updateUser]);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
