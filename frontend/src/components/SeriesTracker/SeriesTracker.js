@@ -259,7 +259,6 @@ const SeriesTracker = () => {
         onConfirm={confirmAddToMyShows}
         message="¿Estás seguro de que quieres agregar esta serie?"
       />
-
       {showSuccessMessage && (
         <SuccessMessage
           message="Serie agregada exitosamente"

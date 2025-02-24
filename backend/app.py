@@ -115,8 +115,11 @@ def add_series():
         # Obtener detalles de la serie desde la API de TMDB
         response = requests.get(
             f'https://api.themoviedb.org/3/tv/{series_id}',
-            params={'api_key': TMDB_API_KEY, 'language': 'es-ES'}
+            params={'api_key': TMDB_API_KEY, 'language': 'es-ES', 'append_to_response': 'seasons'}
         )
+        if response.status_code != 200:
+            return jsonify({'error': 'No se pudo obtener la información de la serie desde TMDB'}), 500
+
         series_data = response.json()
 
         if 'id' not in series_data:

@@ -19,7 +19,8 @@ const SeriesWatch = () => {
         };
     
         const response = await axios.get(`http://localhost:5000/api/series/${user.email}`, config);
-        setSeriesData(response.data.series);
+        console.log(response.data.series); // Inspecciona la estructura de los datos
+        setSeriesData(response.data.series || []); // Asegúrate de que seriesData sea un array
       } catch (error) {
         setError(`Failed to fetch series: ${error.response?.data?.error || error.message}`);
       }
@@ -63,16 +64,22 @@ const SeriesWatch = () => {
   };
 
   const calculateProgress = (seasons) => {
+    if (!seasons || !Array.isArray(seasons)) {
+      return 0; // Si seasons no es un array, devuelve 0
+    }
+
     let totalEpisodes = 0;
     let watchedEpisodes = 0;
 
     seasons.forEach(season => {
-      season.episodes.forEach(episode => {
-        totalEpisodes++;
-        if (episode.watched) {
-          watchedEpisodes++;
-        }
-      });
+      if (season.episodes && Array.isArray(season.episodes)) {
+        season.episodes.forEach(episode => {
+          totalEpisodes++;
+          if (episode.watched) {
+            watchedEpisodes++;
+          }
+        });
+      }
     });
 
     return totalEpisodes === 0 ? 0 : (watchedEpisodes / totalEpisodes) * 100;
@@ -108,7 +115,7 @@ const SeriesWatch = () => {
                   {Math.round(calculateProgress(serie.seasons))}%
                 </span>
               </div>
-              {serie.seasons.map((season, seasonIndex) => (
+              {serie.seasons && serie.seasons.map((season, seasonIndex) => (
                 <div key={season.season_number} className="season-container">
                   <div 
                     className={`season-header ${expandedSeason === `${seriesIndex}-${seasonIndex}` ? 'expanded' : ''}`}
@@ -119,7 +126,7 @@ const SeriesWatch = () => {
                   </div>
                   {expandedSeason === `${seriesIndex}-${seasonIndex}` && (
                     <div className="episodes-container">
-                      {season.episodes.map((episode, episodeIndex) => (
+                      {season.episodes && season.episodes.map((episode, episodeIndex) => (
                         <div key={episode.episode_number} className="episode-item">
                           <label>
                             <input

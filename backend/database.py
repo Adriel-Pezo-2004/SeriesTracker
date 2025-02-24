@@ -1,8 +1,11 @@
+import os
 from pymongo import MongoClient
 from bson import ObjectId
 import jwt
 from datetime import datetime, timedelta
 import logging
+
+import requests
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -31,9 +34,71 @@ class DatabaseManager:
             if self.get_series_by_user(email, series['id']):
                 return {'error': 'Esta serie ya ha sido agregada'}
 
+            # Obtener las temporadas y episodios de la serie desde la API de TMDB
+            series_id = series['id']
+            TMDB_API_KEY = os.getenv('TMDB_API_KEY')
+            response = requests.get(
+                f'https://api.themoviedb.org/3/tv/{series_id}',
+                params={
+                    'api_key': TMDB_API_KEY,
+                    'language': 'es-ES',
+                    'append_to_response': 'seasons'  # Incluir las temporadas en la respuesta
+                }
+            )
+            if response.status_code != 200:
+                return {'error': 'No se pudieron obtener los detalles de la serie desde TMDB'}
+
+            series_details = response.json()
+
+            # Verificar si la respuesta contiene las temporadas
+            if 'seasons' not in series_details:
+                return {'error': 'No se pudieron obtener las temporadas de la serie'}
+
+            # Preparar la estructura de la serie con temporadas y episodios
+            series_data = {
+                "series_id": series_details['id'],
+                "name": series_details['name'],
+                "poster_path": series_details['poster_path'],
+                "seasons": []
+            }
+
+            # Obtener los episodios de cada temporada
+            for season in series_details['seasons']:
+                season_number = season['season_number']
+                season_response = requests.get(
+                    f'https://api.themoviedb.org/3/tv/{series_id}/season/{season_number}',
+                    params={
+                        'api_key': TMDB_API_KEY,
+                        'language': 'es-ES'
+                    }
+                )
+                if season_response.status_code != 200:
+                    continue  # Saltar esta temporada si no se pueden obtener los episodios
+
+                season_details = season_response.json()
+
+                # Preparar la estructura de la temporada con episodios
+                season_data = {
+                    "season_number": season_number,
+                    "episodes": []
+                }
+
+                # Agregar los episodios a la temporada
+                for episode in season_details['episodes']:
+                    episode_data = {
+                        "episode_number": episode['episode_number'],
+                        "name": episode['name'],
+                        "air_date": episode.get('air_date', ''),  # Usar get para evitar errores si no hay fecha
+                        "watched": False  # Por defecto, el episodio no está visto
+                    }
+                    season_data['episodes'].append(episode_data)
+
+                series_data['seasons'].append(season_data)
+
+            # Guardar la serie en la base de datos
             result = self.series_collection.update_one(
                 {"email": email},
-                {"$push": {"series": series}},
+                {"$push": {"series": series_data}},
                 upsert=True
             )
             return result
