@@ -1,0 +1,85 @@
+.confirmation-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  
+  .confirmation-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .confirmation-modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    transform: scale(0.8); /* Inicia más pequeño */
+    transition: transform 0.3s ease, opacity 0.3s ease; /* Transición de escala y opacidad */
+    opacity: 0; /* Inicia invisible */
+    max-width: 400px;
+    width: 90%;
+  }
+  
+  .confirmation-modal-overlay.active .confirmation-modal-content {
+    transform: scale(1); /* Escala a tamaño normal */
+    opacity: 1; /* Se hace visible */
+  }
+  
+  .confirmation-modal-message {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 24px;
+  }
+  
+  .confirmation-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+  
+  .confirmation-modal-button {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: auto;
+  }
+  
+  .confirmation-modal-button.cancel {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+  
+  .confirmation-modal-button.confirm {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .confirmation-modal-button.cancel:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px); /* Efecto de levantar */
+  }
+  
+  .confirmation-modal-button.confirm:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px); /* Efecto de levantar */
+  }
+  
+  .confirmation-modal-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); /* Sombra al enfocar */
+  }
