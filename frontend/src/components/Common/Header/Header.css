@@ -21,7 +21,7 @@
 }
 
 .header nav ul li a,
-.header nav ul li button {
+.logout-link{
   color: white;
   text-decoration: none;
   font-weight: 400;
@@ -34,12 +34,12 @@
 }
 
 .header nav ul li a:hover,
-.header nav ul li button:hover {
+.logout-link:hover {
   transform: scale(1.15); /* Zoom más controlado */
   font-weight: 600;
 }
 
-.header nav ul li button.logout-link:hover {
+.logout-link:hover {
   color: rgb(228, 56, 56); 
   font-weight: 700;
 }

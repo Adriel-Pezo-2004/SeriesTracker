@@ -53,7 +53,7 @@
   box-shadow: 0 0 8px rgba(100, 116, 139, 0.5);
 }
 
-button {
+.logbutton {
   width: 100%;
   padding: 15px;
   background-color: #64748b;
@@ -66,6 +66,6 @@ button {
   transition: background-color 0.3s ease;
 }
 
-button:hover {
+.logbutton:hover {
   background-color: #4b5563;
 }

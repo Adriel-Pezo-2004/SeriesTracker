@@ -2,7 +2,9 @@ import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 import { Search, Plus, Check, Star } from 'lucide-react';
-import ErrorModal from '../Common/ErrorModal/ErrorModal';
+import ErrorModal from '../Modals/ErrorModal/ErrorModal';
+import ConfirmationModal from '../Modals/ConfirmationModal/ConfirmationModal';
+import SuccessMessage from '../Modals/SuccessMessage/SuccessMessage';
 import './SeriesTracker.css';
 
 const SeriesTracker = () => {
@@ -14,7 +16,27 @@ const SeriesTracker = () => {
   const [currentRecommendation, setCurrentRecommendation] = useState('');
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [selectedShow, setSelectedShow] = useState(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const { user } = useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchUserShows = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/series/${user.email}`);
+        if (response.data.series) {
+          setMyShows(response.data.series);
+        }
+      } catch (error) {
+        console.error('Error fetching user shows:', error);
+      }
+    };
+  
+    if (user?.email) {
+      fetchUserShows();
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -108,16 +130,24 @@ const SeriesTracker = () => {
   };
 
   const addToMyShows = async (show) => {
-    if (myShows.some((s) => s.id === show.id)) {
+    if (myShows.some((s) => s.id === show.id || s.series_id === show.id)) {
       setErrorMessage('Esta serie ya ha sido agregada.');
       setIsErrorModalOpen(true);
       return;
     }
+
+    console.log('Opening modal...');
+    setSelectedShow(show);
+    setIsConfirmationModalOpen(true);
+  };
+  
+  const confirmAddToMyShows = async () => {
+    setIsConfirmationModalOpen(false);
   
     try {
       const response = await axios.post('http://localhost:5000/api/series/add', {
         email: user.email,
-        series_id: show.id
+        series_id: selectedShow.id
       }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -125,8 +155,12 @@ const SeriesTracker = () => {
       });
   
       if (response.data.message) {
-        setMyShows([...myShows, show]);
-        alert('Series added successfully');
+        // Recargar las series del usuario después de añadir una nueva
+        const updatedSeriesResponse = await axios.get(`http://localhost:5000/api/series/${user.email}`);
+        if (updatedSeriesResponse.data.series) {
+          setMyShows(updatedSeriesResponse.data.series);
+        }
+        setShowSuccessMessage(true);
       } else {
         setErrorMessage(response.data.error || 'Failed to add series');
         setIsErrorModalOpen(true);
@@ -135,7 +169,7 @@ const SeriesTracker = () => {
       setErrorMessage(error.response?.data?.error || 'An error occurred. Please try again.');
       setIsErrorModalOpen(true);
     }
-  };  
+  };
 
   return (
     <div className="app-container">
@@ -181,13 +215,17 @@ const SeriesTracker = () => {
                   )}
                   <button
                     onClick={() => addToMyShows(show)}
-                    className="add-button"
-                    disabled={myShows.some((s) => s.id === show.id)}
+                    className={`add-button ${
+                      myShows.some((s) => s.id === show.id || s.series_id === show.id)
+                        ? "checked"
+                        : "plus"
+                    }`}
+                    disabled={myShows.some((s) => s.id === show.id || s.series_id === show.id)}
                   >
-                    {myShows.some((s) => s.id === show.id) ? (
-                      <Check size={16} className="text-green-500" />
+                    {myShows.some((s) => s.id === show.id || s.series_id === show.id) ? (
+                      <Check size={16} />
                     ) : (
-                      <span className="text-blue-500">+</span>
+                      <Plus size={16} />
                     )}
                   </button>
                 </div>
@@ -214,6 +252,20 @@ const SeriesTracker = () => {
         onClose={() => setIsErrorModalOpen(false)}
         message={errorMessage}
       />
+
+      <ConfirmationModal
+        isOpen={isConfirmationModalOpen}
+        onClose={() => setIsConfirmationModalOpen(false)}
+        onConfirm={confirmAddToMyShows}
+        message="¿Estás seguro de que quieres agregar esta serie?"
+      />
+
+      {showSuccessMessage && (
+        <SuccessMessage
+          message="Serie agregada exitosamente"
+          onClose={() => setShowSuccessMessage(false)}
+        />
+      )}
     </div>
   );
 };

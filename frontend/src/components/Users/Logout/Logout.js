@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
-import LogoutModal from '../LogoutModal/LogoutModal';
+import LogoutModal from '../../Modals/LogoutModal/LogoutModal';
 
 const Logout = () => {
   const { logout } = useContext(AuthContext);

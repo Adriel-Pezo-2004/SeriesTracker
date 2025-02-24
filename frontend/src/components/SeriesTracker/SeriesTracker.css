@@ -221,6 +221,17 @@
   color: #64748b;
 }
 
+.add-button.checked {
+  background-color: #22c55e; 
+  color: white;
+}
+
+.add-button.plus {
+  background-color: #3b82f6; 
+  color: white;
+}
+
+
 /* Media queries */
 @media (min-width: 640px) {
   .series-grid {

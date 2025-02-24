@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
-import LogoutModal from '../../Users/LogoutModal/LogoutModal';
+import LogoutModal from '../../Modals/LogoutModal/LogoutModal';
 import './Header.css';
 
 const Header = () => {
