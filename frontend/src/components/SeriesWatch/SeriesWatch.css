@@ -231,13 +231,13 @@
   color: #ffd700;
 }
 
-.search-container {
+.search-container2 {
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
 }
 
-.search-input {
+.search-input2 {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #d1d5db;
@@ -247,6 +247,6 @@
   transition: border-color 0.3s ease;
 }
 
-.search-input:focus {
+.search-input2:focus {
   border-color: #264b7e;
 }

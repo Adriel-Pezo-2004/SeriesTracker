@@ -19,9 +19,8 @@ const SeriesWatch = () => {
         };
   
         const response = await axios.get(`http://localhost:5000/api/series/${user.email}`, config);
-        console.log(response.data.series); // Inspecciona la estructura de los datos
         setSeriesData(response.data.series || []);
-        setFilteredSeries(response.data.series || []); // Agregar esta línea
+        setFilteredSeries(response.data.series || []); // Inicializa filteredSeries con los datos de la API
       } catch (error) {
         setError(`Failed to fetch series: ${error.response?.data?.error || error.message}`);
       }
@@ -32,17 +31,19 @@ const SeriesWatch = () => {
     }
   }, [user]);
   
-
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-    if (query.trim() === '') {
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
       setFilteredSeries(seriesData);
     } else {
-      const filtered = seriesData.filter(serie => 
-        serie.name.toLowerCase().includes(query.toLowerCase())
+      const filtered = seriesData.filter(serie =>
+        serie.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredSeries(filtered);
     }
+  }, [seriesData, searchQuery]);
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
   };
   
 
@@ -100,15 +101,16 @@ const SeriesWatch = () => {
     return totalEpisodes === 0 ? 0 : (watchedEpisodes / totalEpisodes) * 100;
   };
 
-  const handleRatingChange = async (seriesIndex, rating) => {
-    const updatedSeries = [...seriesData];
-    updatedSeries[seriesIndex].rating = rating;
+  const handleRatingChange = async (seriesId, rating) => {
+    const updatedSeries = seriesData.map(serie => 
+      serie.series_id === seriesId ? { ...serie, rating } : serie
+    );
     setSeriesData(updatedSeries);
   
     try {
       const response = await axios.post('http://localhost:5000/api/series/update_rating', {
         email: user.email,
-        series_id: updatedSeries[seriesIndex].series_id,
+        series_id: seriesId,
         rating: rating
       }, {
         headers: {
@@ -127,13 +129,13 @@ const SeriesWatch = () => {
   return (
     <div className="app-container">
       <h2 className="main-title-profile">Mis Series</h2>
-      <div className="search-container">
+      <div className="search-container2">
         <input
           type="text"
           placeholder="Buscar series..."
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
-          className="search-input"
+          className="search-input2"
         />
       </div>
       <div className="results-container">
@@ -155,15 +157,15 @@ const SeriesWatch = () => {
             </div>
             <div className="series-content-watch">
               <div className="rating-container">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span
-                    key={star}
-                    className={`star ${star <= (serie.rating || 0) ? 'filled' : ''}`}
-                    onClick={() => handleRatingChange(seriesIndex, star)}
-                  >
-                    ★
-                  </span>
-                ))}
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span
+                  key={star}
+                  className={`star ${star <= (serie.rating || 0) ? 'filled' : ''}`}
+                  onClick={() => handleRatingChange(serie.series_id, star)}
+                >
+                  ★
+                </span>
+              ))}
               </div>
               <div className="progress-bar-container">
                 <div
