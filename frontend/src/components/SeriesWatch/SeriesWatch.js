@@ -5,31 +5,46 @@ import './SeriesWatch.css';
 
 const SeriesWatch = () => {
   const [seriesData, setSeriesData] = useState([]);
+  const [filteredSeries, setFilteredSeries] = useState([]);
   const [error, setError] = useState(null);
   const { user } = useContext(AuthContext);
   const [expandedSeason, setExpandedSeason] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchSeries = async () => {
       try {
         const config = {
-          headers: { 
-            Authorization: `Bearer ${localStorage.getItem('token')}` 
-          }
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         };
-    
+  
         const response = await axios.get(`http://localhost:5000/api/series/${user.email}`, config);
         console.log(response.data.series); // Inspecciona la estructura de los datos
-        setSeriesData(response.data.series || []); // Asegúrate de que seriesData sea un array
+        setSeriesData(response.data.series || []);
+        setFilteredSeries(response.data.series || []); // Agregar esta línea
       } catch (error) {
         setError(`Failed to fetch series: ${error.response?.data?.error || error.message}`);
       }
     };
-
+  
     if (user && user.email) {
       fetchSeries();
     }
   }, [user]);
+  
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (query.trim() === '') {
+      setFilteredSeries(seriesData);
+    } else {
+      const filtered = seriesData.filter(serie => 
+        serie.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredSeries(filtered);
+    }
+  };
+  
 
   const handleEpisodeToggle = async (seriesIndex, seasonIndex, episodeIndex) => {
     const updatedSeries = [...seriesData];
@@ -112,8 +127,17 @@ const SeriesWatch = () => {
   return (
     <div className="app-container">
       <h2 className="main-title-profile">Mis Series</h2>
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Buscar series..."
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="search-input"
+        />
+      </div>
       <div className="results-container">
-        {seriesData.map((serie, seriesIndex) => (
+        {filteredSeries.map((serie, seriesIndex) => (
           <div key={serie.series_id} className="series-card-watch">
             <div className="series-poster-watch">
               {serie.poster_path ? (
