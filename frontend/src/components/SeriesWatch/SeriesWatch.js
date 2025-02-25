@@ -85,6 +85,30 @@ const SeriesWatch = () => {
     return totalEpisodes === 0 ? 0 : (watchedEpisodes / totalEpisodes) * 100;
   };
 
+  const handleRatingChange = async (seriesIndex, rating) => {
+    const updatedSeries = [...seriesData];
+    updatedSeries[seriesIndex].rating = rating;
+    setSeriesData(updatedSeries);
+  
+    try {
+      const response = await axios.post('http://localhost:5000/api/series/update_rating', {
+        email: user.email,
+        series_id: updatedSeries[seriesIndex].series_id,
+        rating: rating
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+  
+      if (!response.data.message) {
+        throw new Error('Failed to update series rating');
+      }
+    } catch (error) {
+      setError('Failed to update series rating');
+    }
+  };
+
   return (
     <div className="app-container">
       <h2 className="main-title-profile">Mis Series</h2>
@@ -106,6 +130,17 @@ const SeriesWatch = () => {
               <h3 className="series-title-watch">{serie.name}</h3>
             </div>
             <div className="series-content-watch">
+              <div className="rating-container">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    className={`star ${star <= (serie.rating || 0) ? 'filled' : ''}`}
+                    onClick={() => handleRatingChange(seriesIndex, star)}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
               <div className="progress-bar-container">
                 <div
                   className="progress-bar"

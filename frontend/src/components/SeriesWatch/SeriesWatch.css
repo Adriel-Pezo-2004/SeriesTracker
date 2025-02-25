@@ -208,3 +208,25 @@
     border-radius: 0.75rem 0.75rem 0 0;
   }
 }
+
+.rating-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.star {
+  font-size: 1.5rem;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.star.filled {
+  color: #ffd700;
+}
+
+.star:hover {
+  color: #ffd700;
+}

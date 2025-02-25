@@ -181,3 +181,14 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Error actualizando usuario: {str(e)}")
             return {'error': 'Error interno del servidor'}
+
+    def update_series_rating(self, email, series_id, rating):
+        try:
+            result = self.series_collection.update_one(
+                {"email": email, "series.series_id": series_id},
+                {"$set": {"series.$.rating": rating}}
+            )
+            return result
+        except Exception as e:
+            logger.error(f"Error updating series rating: {str(e)}")
+            raise

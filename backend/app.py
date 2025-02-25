@@ -282,6 +282,26 @@ def update_user_info():
         logger.error(f"Error in /api/users: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
 
+@app.route('/api/series/update_rating', methods=['POST'])
+@token_required
+def update_rating():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        series_id = data.get('series_id')
+        rating = data.get('rating')
+
+        if not email or not series_id or rating is None:
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        result = db_manager.update_series_rating(email, series_id, rating)
+        if result.modified_count == 0:
+            return jsonify({'error': 'Failed to update series rating'}), 400
+
+        return jsonify({'message': 'Series rating updated successfully'})
+    except Exception as e:
+        logger.error(f"Error in /api/series/update_rating: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
