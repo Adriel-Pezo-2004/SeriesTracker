@@ -303,6 +303,46 @@ def update_rating():
         logger.error(f"Error in /api/series/update_rating: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
 
+@app.route('/api/user/stats', methods=['GET'])
+@token_required
+def get_user_stats():
+    try:
+        email = request.args.get('email')
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+
+        user_series = db_manager.get_user_series_by_email(email)
+        if not user_series:
+            return jsonify({'error': 'No series found for this user'}), 404
+
+        total_series = len(user_series)
+        total_episodes = 0
+        watched_episodes = 0
+        completed_series = 0
+
+        for series in user_series:
+            for season in series['seasons']:
+                total_episodes += len(season['episodes'])
+                watched_episodes += sum(1 for episode in season['episodes'] if episode['watched'])
+
+            # Check if the series is completed (all episodes watched)
+            if all(episode['watched'] for season in series['seasons'] for episode in season['episodes']):
+                completed_series += 1
+
+        if total_episodes == 0:
+            watched_percentage = 0
+        else:
+            watched_percentage = (watched_episodes / total_episodes) * 100
+
+        return jsonify({
+            'total_series': total_series,
+            'watched_percentage': round(watched_percentage, 2),
+            'completed_series': completed_series
+        })
+    except Exception as e:
+        logger.error(f"Error in /api/user/stats: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
 
