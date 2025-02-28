@@ -98,42 +98,37 @@ def login():
         return jsonify({'error': 'Internal Server Error'}), 500
 
 @app.route('/api/series/add', methods=['POST'])
-@token_required
 def add_series():
     try:
         data = request.get_json()
         email = data.get('email')
         series_id = data.get('series_id')
-
+        
         if not email or not series_id:
             return jsonify({'error': 'Email and series_id are required'}), 400
 
-        # Verificar si la serie ya ha sido añadida por el usuario
-        if db_manager.get_series_by_user(email, series_id):
-            return jsonify({'error': 'Esta serie ya ha sido agregada'}), 400
-
         # Obtener detalles de la serie desde la API de TMDB
         response = requests.get(
-            f'https://api.themoviedb.org/3/tv/{series_id}',
-            params={'api_key': TMDB_API_KEY, 'language': 'es-ES', 'append_to_response': 'seasons'}
+            f'{TMDB_BASE_URL}/tv/{series_id}',
+            params={'api_key': TMDB_API_KEY, 'language': 'es-ES'}
         )
         if response.status_code != 200:
-            return jsonify({'error': 'No se pudo obtener la información de la serie desde TMDB'}), 500
+            return jsonify({'error': 'Failed to fetch series details from TMDB'}), 500
 
         series_data = response.json()
+        
+        genres = [genre['name'] for genre in series_data.get('genres', [])]
+        series_data['genres'] = genres  # Agregar géneros
 
-        if 'id' not in series_data:
-            return jsonify({'error': 'Invalid series ID'}), 400
-
-        # Agregar la serie a la base de datos
         result = db_manager.add_series_to_user(email, series_data)
         if result.modified_count == 0:
             return jsonify({'error': 'Failed to add series'}), 400
 
         return jsonify({'message': 'Series added successfully'})
     except Exception as e:
-        logger.error(f"Error in /api/series/add: {str(e)}")
+        logging.error(f"Error in /api/series/add: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
+
 
 @app.route('/api/series/<email>', methods=['GET'])
 def get_user_series(email):
@@ -341,6 +336,37 @@ def get_user_stats():
         })
     except Exception as e:
         logger.error(f"Error in /api/user/stats: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+@app.route('/api/user/genre_stats', methods=['GET'])
+@token_required
+def get_genre_stats():
+    try:
+        email = request.args.get('email')
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+
+        user_series = db_manager.get_user_series_by_email(email)
+        if not user_series:
+            return jsonify({'error': 'No series found for this user'}), 404
+
+        # Count genres
+        genre_counts = {}
+        for series in user_series:
+            for genre in series.get('genres', []):
+                if genre in genre_counts:
+                    genre_counts[genre] += 1
+                else:
+                    genre_counts[genre] = 1
+        
+        # Convert to list of objects for the frontend
+        genre_data = [{"name": genre, "count": count} for genre, count in genre_counts.items()]
+        
+        return jsonify({
+            'genres': genre_data
+        })
+    except Exception as e:
+        logger.error(f"Error in /api/user/genre_stats: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
 
 if __name__ == '__main__':

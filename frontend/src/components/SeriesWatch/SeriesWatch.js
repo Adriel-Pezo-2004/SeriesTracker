@@ -154,6 +154,11 @@ const SeriesWatch = () => {
                 </div>
               )}
               <h3 className="series-title-watch">{serie.name}</h3>
+              <div className="series-genres">
+                {serie.genres && serie.genres.map((genre, idx) => (
+                  <span key={idx} className="genre-tag">{genre}</span>
+                ))}
+              </div>
             </div>
             <div className="series-content-watch">
               <div className="rating-container">

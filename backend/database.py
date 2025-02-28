@@ -59,6 +59,7 @@ class DatabaseManager:
                 "series_id": series_details['id'],
                 "name": series_details['name'],
                 "poster_path": series_details['poster_path'],
+                "genres": [genre['name'] for genre in series_details.get('genres', [])],  # Agregar géneros
                 "seasons": []
             }
 

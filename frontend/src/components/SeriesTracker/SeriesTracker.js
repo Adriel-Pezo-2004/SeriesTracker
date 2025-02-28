@@ -19,6 +19,7 @@ const SeriesTracker = () => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [selectedShow, setSelectedShow] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [genresMap, setGenresMap] = useState({});
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
@@ -37,6 +38,32 @@ const SeriesTracker = () => {
       fetchUserShows();
     }
   }, [user]);
+
+  // Obtener la lista de géneros de TMDB
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const response = await axios.get('https://api.themoviedb.org/3/genre/tv/list', {
+          params: {
+            api_key: '4e62a98e6cff448f769687990cc3be36',
+            language: 'es-ES'
+          }
+        });
+        
+        // Crear un mapa de ID -> nombre
+        const genresObject = {};
+        response.data.genres.forEach(genre => {
+          genresObject[genre.id] = genre.name;
+        });
+        
+        setGenresMap(genresObject);
+      } catch (error) {
+        console.error('Error fetching genres:', error);
+      }
+    };
+    
+    fetchGenres();
+  }, []);
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -129,6 +156,16 @@ const SeriesTracker = () => {
     }
   };
 
+  // Función para convertir IDs de géneros a nombres
+  const getGenreNames = (genreIds) => {
+    if (!genreIds || genreIds.length === 0) return '';
+    
+    return genreIds
+      .map(id => genresMap[id] || '')
+      .filter(name => name !== '')
+      .join(', ');
+  };
+
   const addToMyShows = async (show) => {
     if (myShows.some((s) => s.id === show.id || s.series_id === show.id)) {
       setErrorMessage('Esta serie ya ha sido agregada.');
@@ -136,7 +173,6 @@ const SeriesTracker = () => {
       return;
     }
 
-    console.log('Opening modal...');
     setSelectedShow(show);
     setIsConfirmationModalOpen(true);
   };
@@ -147,7 +183,8 @@ const SeriesTracker = () => {
     try {
       const response = await axios.post('http://localhost:5000/api/series/add', {
         email: user.email,
-        series_id: selectedShow.id
+        series_id: selectedShow.id,
+        genres: selectedShow.genre_ids // Enviar géneros al backend
       }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -155,7 +192,6 @@ const SeriesTracker = () => {
       });
   
       if (response.data.message) {
-        // Recargar las series del usuario después de añadir una nueva
         const updatedSeriesResponse = await axios.get(`http://localhost:5000/api/series/${user.email}`);
         if (updatedSeriesResponse.data.series) {
           setMyShows(updatedSeriesResponse.data.series);
@@ -170,6 +206,7 @@ const SeriesTracker = () => {
       setIsErrorModalOpen(true);
     }
   };
+
 
   return (
     <div className="app-container">
@@ -234,7 +271,7 @@ const SeriesTracker = () => {
                   <h3 className="series-title">{show.name}</h3>
                   <div className="series-metadata">
                     <span className="series-year">{show.first_air_date?.split('-')[0]}</span>
-                    <span className="series-genre">Social drama</span>
+                    <span className="series-genre">{getGenreNames(show.genre_ids)}</span>  {/* Convertir IDs a nombres */}
                   </div>
                   <div className="series-rating">
                     <Star size={16} className="text-yellow-400" />
